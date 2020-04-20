@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script>
+        function add_class(elt, classname) {
+            // elt.classList.toggle(classname);
+            elt.classList.add(classname)
+        }
+
+        function remove_class(elt, classname) {
+            elt.classList.remove(classname)
+        }
+    </script>
+</head>
+<body>
+<section class="hero is-success is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                Welcome {{g.user.user_fullname}}
+            </h1>
+            <div class="container">
+                <div class="field">
+                    <form method="get" action="{{url_for('database_create')}}">
+                        <label>New database: </label>
+                        <input type="text" name="dbname" placeholder="name"><br>
+                        <input type="submit">
+                    </form>
+                </div>
+
+                <div class="field">
+                    <ol>
+                        {% for token in g.user.get_tokens() %}
+
+                        <li>
+                            <a href="{{url_for('database_stats', token_id=token.token_id)}}">
+                                {{ token.token_database_name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+<script>
+    // setTimeout('window.location.reload()', 1500);
+</script>

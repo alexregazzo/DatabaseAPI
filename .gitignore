@@ -1,0 +1,7 @@
+.idea/
+config.json
+__pycache__/
+**/*.pyc
+**/*.db
+database/data/
+.pytest_cache/

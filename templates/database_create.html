@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating '{{dbname}}'</title>
+    <style>
+        body {
+            background-color: #48c774;
+        }
+    </style>
+    <script>
+        let expiration_time = new Date('{{token.token_activation_code_expiration}}').getTime();
+
+        function update_timer() {
+            let hours_elt = document.getElementById('hours');
+            let minutes_elt = document.getElementById('minutes');
+            let seconds_elt = document.getElementById('seconds');
+            let current_time = new Date().getTime();
+            let remaining_time = expiration_time - current_time;
+            if (remaining_time < 0) {
+                let expired_message_elt = document.getElementById('expired_message');
+                expired_message_elt.innerHTML = 'EXPIRED';
+                remaining_time = 0;
+            }
+            hours_elt.innerHTML = `${Math.floor(remaining_time / (1000 * 60 * 60))}`.padStart(2, '0');
+            minutes_elt.innerHTML = `${Math.floor(remaining_time % (1000 * 60 * 60) / (1000 * 60))}`.padStart(2, '0');
+            seconds_elt.innerHTML = `${Math.floor(remaining_time % (1000 * 60) / (1000))}`.padStart(2, '0');
+        }
+
+        window.onload = function () {
+            update_timer();
+            setInterval('update_timer()', 500);
+        }
+
+
+    </script>
+</head>
+<body>
+<div>
+    <p>Your activation code was sent to your email</p>
+</div>
+<div>
+    <a href="{{url_for('profile')}}">Inicio</a>
+    <div>
+        <p>
+            It expires in <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span> <span id="expired_message" style="color: orangered"></span>
+        </p>
+    </div>
+    <form method="post" action="">
+        <label for="activation_code">Activation code</label><br>
+        <input autocomplete="off" id="activation_code" type="text" name="activation_code" placeholder="Activation code"><br>
+        <input type="hidden" name="token_id" value="{{token.token_id}}">
+        <input type="submit"/>
+    </form>
+</div>
+</body>
+</html>

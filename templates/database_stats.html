@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{token.token_database_name}}</title>
+    <style>
+        body {
+            background-color: #48c774;
+        }
+
+        #token {
+            border: 1px solid black;
+            word-wrap: break-word;
+            width: 50%;
+            height: auto;
+        }
+
+    </style>
+</head>
+<body>
+<div>
+    <a href="{{url_for('profile')}}">Inicio</a>
+    <h1 style="text-align: center;">{{token.token_database_name}}</h1>
+    <div>
+        Token:
+        <br>
+        <div id="token" title="COPY">
+            {{token.token_token}}
+        </div>
+        <span style="color: red; background-color: yellow">
+            *Warning: DO NOT SHARE THIS TOKEN. KEEP IT PRIVATE!
+        </span>
+    </div>
+    <p>
+        Creation: {{token.token_creation}}
+    </p>
+    <p>
+        Active: {{'true' if token.token_active == 1 else 'false'}}
+    </p>
+    {% if token.token_active != 1 and token.token_activation_code != ''%}
+    <p>
+        Code expires on: {{token.token_activation_code_expiration}}
+        <a href="{{url_for('database_create', token_id=token.token_id)}}">Enter code</a>
+    </p>
+    {%endif%}
+
+</div>
+
+</body>
+</html>
