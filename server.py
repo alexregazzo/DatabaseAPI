@@ -18,15 +18,13 @@ app.secret_key = CONFIG['flask_secret_key']
 # ----------------------------------------------------------- GENERAL -----------------------------------------------------------
 @app.route("/")
 def index():
-    return redirect(url_for('login'))
-    # return "index"
+    return render_template("index.html")
 
 
 # ----------------------------------------------------------- API -----------------------------------------------------------
 @app.route("/docs")
 def docs():
-    return redirect(url_for('login'))
-    # return "documentation"
+    return render_template("documentation.html")
 
 
 def restricted_token_access(func):
