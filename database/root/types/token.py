@@ -1,3 +1,4 @@
+import smtplib
 import datetime
 import jwt
 import secrets
@@ -39,12 +40,12 @@ class Token:
             return results[0]
         raise Exception('Token not found')
 
-    def verify_code(self, activation_code) -> None:
+    def verify_code(self, activation_code: str) -> None:
         """Return whether the code was verified"""
         if self.token_activation_code is None or self.token_activation_code == "":
             raise Exception("No activation code")
 
-        if self.token_activation_code == activation_code:
+        if self.token_activation_code.upper() == activation_code.upper():
             self.token_active = 1
             self.token_activation_code = ''
             self.token_activation_code_expiration = ''
@@ -58,9 +59,15 @@ class Token:
     def create_activation_code(self, user):
         self.token_activation_code = secrets.token_hex(3).upper()
         self.token_activation_code_expiration = (datetime.datetime.now() + datetime.timedelta(minutes=30)).strftime(database.settings.DATETIME_FORMAT)
-        # send email
-        # TODO: send email
-        print(f"MOCK EMAIL SEND: to: {user.user_email} code: {self.token_activation_code} creation: {self.token_creation}")
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login("regazzo.database.api@gmail.com", database.settings.GMAIL_APP_PASSWORD)
+            subject = "Confirmation Code from Database API"
+            body = f"Confirmation code: {self.token_activation_code}"
+            msg = f'Subject: {subject}\n\n{body}'
+            smtp.sendmail("regazzo.database.api@gmail.com", user.user_email, msg)
+
+        # print(f"MOCK EMAIL SEND: to: {user.user_email} code: {self.token_activation_code} creation: {self.token_creation}")
 
     def __repr__(self):
         return f"<{type(self).__name__} {self.__dict__}>"

@@ -37,7 +37,7 @@
 </head>
 <body>
 <div>
-    <p>Your activation code was sent to your email</p>
+    <p>Your activation code was sent to your email from 'regazzo.database.api@gmail.com'. Check your spam if not found</p>
 </div>
 <div>
     <a href="{{url_for('profile')}}">Inicio</a>
@@ -48,7 +48,7 @@
     </div>
     <form method="post" action="">
         <label for="activation_code">Activation code</label><br>
-        <input autocomplete="off" id="activation_code" type="text" name="activation_code" placeholder="Activation code"><br>
+        <input autocomplete="off" id="activation_code" type="text" name="activation_code" placeholder="6-digit alphanumeric code"><br>
         <input type="hidden" name="token_id" value="{{token.token_id}}">
         <input type="submit"/>
     </form>

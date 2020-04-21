@@ -140,8 +140,6 @@ def login():
 @restricted_login_access
 def profile():
     """
-    TODO: create tokens [database]
-    TODO: show tokens [database]
     TODO: revoke token [database]
     """
     return render_template("profile.html", databases_names="<br/>".join([token.token_database_name for token in g.user.get_tokens()]))
