@@ -2,12 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Documentation</title>
+    <title>API Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        function load_markdown() {
+            for (let elt of document.querySelectorAll('.markdown')) {
+                elt.innerHTML = marked(elt.innerText);
+            }
+        }
+
+    </script>
+
 </head>
-<body>
-<!--TODO: check for markdown-->
+<body onload="load_markdown()">
+<div class="markdown">
+    # Database API documentation
+    <br>
+    <br>
+    **API endpoint**: {{api_endpoint}}
+    DOCUMENTANTION IN DEVELOPMENT
 
-    IN DEVELOPMENT
-
+</div>
 </body>
 </html>

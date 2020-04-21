@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for, g, render_template
+from flask import Flask, request, session, redirect, url_for, g, render_template, Response
 from functools import wraps
 import api_response
 import database.user
@@ -8,6 +8,9 @@ import json
 import hashlib
 import jwt
 import os
+
+# TODO: setup logging
+# TODO: treat web pages errors better
 
 current_dir = os.path.dirname(__file__)
 with open(os.path.join(current_dir, "config.json")) as file:
@@ -26,7 +29,20 @@ def index():
 # ----------------------------------------------------------- API -----------------------------------------------------------
 @app.route("/docs")
 def docs():
-    return render_template("documentation.html")
+    api_endpoint = request.url_root[:-1] + url_for('database_use')
+    response_examples = {
+        'request_error': api_response.APIResponse.bad(query=api_endpoint + "?token=your_api_token&q=select * from tablename", error_message="Some error message").json(indent=4)
+    }
+    return render_template("documentation.html", api_endpoint=api_endpoint, response_examples=response_examples)
+
+
+@app.route("/docs/file")
+def docs_file():
+    try:
+        with open(os.path.join(current_dir, 'templates/docs.md')) as f:
+            return Response(f.read(), mimetype="text/plain")
+    except Exception as e:
+        return e
 
 
 def restricted_token_access(func):
@@ -41,7 +57,7 @@ def restricted_token_access(func):
                 except:
                     return api_response.APIResponse.bad(query=request.url, error_message="Invalid token").get_response()
                 else:
-                    return func(*args, decoded_token=decoded_token, **kwargs)
+                    return func(*args, token=token_token, decoded_token=decoded_token, **kwargs)
             return api_response.APIResponse.bad(query=request.url, error_message="Missing token").get_response()
 
     return authenticate_token
@@ -49,18 +65,18 @@ def restricted_token_access(func):
 
 @app.route("/api/v1/query/")
 @restricted_token_access
-def database_use(decoded_token: dict):
+def database_use(token: str, decoded_token: dict):
     try:
         query = request.args['q']
     except KeyError:
-        return api_response.APIResponse.bad(query=request.url, error_message="Arguments missing: q").get_response()
+        return api_response.APIResponse.bad(query=request.url, token=token, error_message="Arguments missing: q").get_response()
     except:
         pass
     else:
         with database.user.UserDatabase(decoded_token['user_email'], decoded_token['database_name']) as db:
-            return api_response.APIResponse.good(query=request.url, database_response=db.execute(query)).get_response()
+            return api_response.APIResponse.good(query=request.url, token=token, database_response=db.execute(query)).get_response()
 
-    return api_response.APIResponse.bad(query=request.url, error_message="Unkown error").get_response()
+    return api_response.APIResponse.bad(query=request.url, token=token, error_message="Unkown error").get_response()
 
 
 #
@@ -112,8 +128,6 @@ def signup():
         try:
             user = database.root.types.user.User.create(user_fullname=user_fullname, user_email=user_email, user_password=user_password)
             session['user_id'] = user.user_id
-            print(True)
-            print(user)
             return redirect(url_for("profile"))
         except Exception as e:
             return render_template("signup.html", error_message="* Something went wrong while creating the account, maybe its already created" + str(e))
@@ -191,13 +205,13 @@ def database_stats():
     token_id = request.args.get('token_id')
     if token_id:
         # token query found
-
         try:
             token = database.root.types.token.Token.get(token_id=token_id)
             # token found
             if token.user_id == g.user.user_id:
                 # match user
-                return render_template('database_stats.html', token=token)
+                uses = token.get_uses()
+                return render_template('database_stats.html', token=token, uses=uses)
         except:
             pass
     return redirect(url_for('profile'))
@@ -207,6 +221,7 @@ if __name__ == "__main__":
     import platform
 
     if platform.system() == "Windows":
-        app.run("127.0.0.4", port=80, debug=True)
+        # app.run("127.0.0.4", port=80, debug=True)
+        app.run("127.0.0.4", port=5478, debug=True)
     elif platform.system() == "Linux":
         app.run(host='0.0.0.0', port=8245)

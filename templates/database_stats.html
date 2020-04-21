@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>{{token.token_database_name}}</title>
     <style>
+
         body {
             background-color: #48c774;
         }
@@ -13,6 +14,21 @@
             word-wrap: break-word;
             width: 50%;
             height: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid blue;
+            text-align: center;
+
+        }
+
+        div {
+            /*border: 1px solid black;*/
         }
 
     </style>
@@ -33,8 +49,7 @@
         <br>
         <span>
             Token use:<br>
-            http://alextestdomain.duckdns.org:8245/api/v1/query/?q=[YOUR_QUERY]&token=[YOUR_TOKEN]
-
+            http://alextestdomain.duckdns.org:8245/api/v1/query/?q=[YOUR_SQL_QUERY]&token=[YOUR_TOKEN]
         </span>
     </div>
     <p>
@@ -49,6 +64,53 @@
         <a href="{{url_for('database_create', token_id=token.token_id)}}">Enter code</a>
     </p>
     {%endif%}
+    <hr>
+    <div>
+        <h3 style="text-align: center">Requests</h3>
+        <table>
+            <tbody>
+            <tr>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Database response</th>
+                <th>Error message</th>
+            </tr>
+            {% for use in uses %}
+
+            <tr>
+                <td>{{use.use_creation}}</td>
+                <td style='color: {{"black" if use.data["status"] < 400 else "red"}};'>{{use.data['status']}}</td>
+                <td>
+                    {% if use.data['database_response']%}
+                    <table>
+                        <tbody>
+                        <tr>
+                            <th>Status</th>
+                            <th>Query</th>
+                            <th>Error message</th>
+                        </tr>
+                        <tr>
+                            <td style='color: {{"black" if use.data['database_response']['status'] < 400 else "red"}};'>{{use.data['database_response']['status']}}</td>
+                            <td>{{use.data['database_response']['query']}}</td>
+                            <td>{{use.data['database_response']['error_message']}}</td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                    {% else %}
+                    null
+                    {% endif %}
+                </td>
+                <td>
+                    {{use.data['error_message'] if use.data['error_message'] else 'null'}}
+                </td>
+            </tr>
+            {%endfor%}
+            </tbody>
+        </table>
+
+
+    </div>
 
 </div>
 

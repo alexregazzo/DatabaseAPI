@@ -48,7 +48,7 @@ class User:
 
     def get_tokens(self):
         """
-        :return: list of database names from this user
+        :return: list of database tokens from this user
         :rtype: list[database.root.types.token.Token]
         """
         with database.root.RootDatabase() as root_db:

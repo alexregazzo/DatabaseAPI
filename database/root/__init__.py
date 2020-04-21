@@ -5,6 +5,7 @@ import database.settings
 import database.root.response
 import database.root.types.user
 import database.root.types.token
+import database.root.types.use
 
 
 class RootDatabase:
@@ -20,7 +21,7 @@ class RootDatabase:
         assert type(autocommit) is bool
         assert type(autorollback) is bool
 
-        path = os.path.join(database.settings.USER_DATABASE_PATH, database_name)
+        path = os.path.join(database.settings.ROOT_DATABASE_PATH, database_name)
         if os.path.splitext(path)[1] != ".db":
             path += ".db"
         os.makedirs(os.path.split(path)[0], exist_ok=True)
@@ -86,9 +87,9 @@ class RootDatabase:
             else:
                 return database.root.response.RootDatabaseResponse.good(script)
 
-    def insert_user(self, *,user_fullname: str, user_email: str, user_password: str):
+    def insert_user(self, *, user_fullname: str, user_email: str, user_password: str):
         """
-        Return User or None if error
+        Return User
         Warning: user_id ignored
         :rtype: database.root.types.user.User
         """
@@ -102,7 +103,7 @@ class RootDatabase:
 
     def select_user(self, **kwargs):
         """
-        Return user match or None
+        :return: User
         :rtype: database.root.types.user.User
         """
         response = self.execute(f"SELECT * FROM user WHERE {self.make_query_from_dict(' and ', **kwargs)}")
@@ -114,9 +115,9 @@ class RootDatabase:
     # def update_user(self):
     #     pass
 
-    def insert_token(self, *,user_id: int, token_database_name: str):
+    def insert_token(self, *, user_id: int, token_database_name: str):
         """
-        Return token_id or None if error
+        :return: Token
         Warning: user_id ignored
         :rtype
         """
@@ -137,7 +138,7 @@ class RootDatabase:
 
     def select_tokens(self, **kwargs):
         """
-        Return list of tokens match according to kwargs
+        :return: list of tokens match according to kwargs
         :rtype: list[database.root.types.token.Token]
         """
         response = self.execute(f"SELECT * FROM token WHERE {self.make_query_from_dict(' and ', **kwargs)}")
@@ -147,14 +148,35 @@ class RootDatabase:
                 results.append(database.root.types.token.Token.from_dict(token_dict))
         return results
 
-    def update_token(self, *,token_id, **kwargs):
+    def update_token(self, *, token_id, **kwargs):
         """
-        Return bool whether the operation has gone right
+        :return: bool whether the operation has gone right
         :rtype: None
         """
         response = self.execute(f"UPDATE token SET {self.make_query_from_dict(', ', **kwargs)} WHERE token_id='{token_id}'")
         if not response.ok:
             raise Exception("Could not update token")
+
+    def insert_use(self, *, token_id: int, use_data: str):
+        """
+        :return: Use
+        Warning: user_id ignored
+        :rtype: bool
+        """
+        response = self.execute(f"INSERT INTO use (token_id, use_data) VALUES ('{token_id}', '{use_data}')")
+        return response.ok
+
+    def select_uses(self, **kwargs):
+        """
+        :return: list of uses match according to kwargs
+        :rtype: list[database.root.types.use.Use]
+        """
+        response = self.execute(f"SELECT * FROM use WHERE {self.make_query_from_dict(' and ', **kwargs)}")
+        results = []
+        if response.ok:
+            for use_dict in response.results:
+                results.append(database.root.types.use.Use.from_dict(use_dict))
+        return results
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import jwt
 import secrets
 import database.settings
 import database.root
+import database.root.types.use
 
 
 class Token:
@@ -92,6 +93,14 @@ class Token:
             token.create_activation_code(user)
             root_db.update_token(token_id=token.token_id, **token.get_dict_update())
         return token
+
+    def get_uses(self):
+        """
+        :return: list of uses from this token
+        :rtype: list[database.root.types.use.Use]
+        """
+        with database.root.RootDatabase() as root_db:
+            return root_db.select_uses(token_id=self.token_id)
 
 
 if __name__ == "__main__":

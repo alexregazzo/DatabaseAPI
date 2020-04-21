@@ -24,10 +24,8 @@ CREATE TABLE IF NOT EXISTS token
 CREATE TABLE IF NOT EXISTS use
 (
     use_id       integer primary key autoincrement,
-    token_id     integer,
---  use_query
---  use_query_response_code
---  use_query_error_message
-    use_creation text default current_timestamp,
+    token_id     integer not null,
+    use_data     text    not null,
+    use_creation text    not null default current_timestamp,
     foreign key (token_id) references token (token_id)
 )
