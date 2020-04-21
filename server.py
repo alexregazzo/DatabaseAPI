@@ -1,7 +1,9 @@
-from flask import Flask, request, make_response, session, redirect, url_for, g, render_template
+from flask import Flask, request, session, redirect, url_for, g, render_template
 from functools import wraps
-import server_response
-import database
+import api_response
+import database.user
+import database.root.types.user
+import database.root.types.token
 import json
 import hashlib
 import jwt
@@ -30,36 +32,35 @@ def docs():
 def restricted_token_access(func):
     @wraps(func)
     def authenticate_token(*args, **kwargs):
+
         if request.method == "GET":
             token_token = request.args.get('token')
             if token_token:
                 try:
                     decoded_token = jwt.decode(token_token, TOKEN_KEY)
                 except:
-                    return make_response({"error_message": "Invalid token"}, 400)
+                    return api_response.APIResponse.bad(query=request.url, error_message="Invalid token").get_response()
                 else:
                     return func(*args, decoded_token=decoded_token, **kwargs)
-            return make_response({"error_message": "Missing token"}, 400)
+            return api_response.APIResponse.bad(query=request.url, error_message="Missing token").get_response()
 
     return authenticate_token
 
 
-@app.route("/api/v1/<string:query_type>/")
+@app.route("/api/v1/query/")
 @restricted_token_access
-def database_use(query_type, decoded_token: dict):
+def database_use(decoded_token: dict):
     try:
         query = request.args['q']
     except KeyError:
-        return make_response(server_response.BadResponse("Arguments missing: database and/or q").json(), 400)
+        return api_response.APIResponse.bad(query=request.url, error_message="Arguments missing: q").get_response()
     except:
         pass
     else:
-        if query_type in database.Database.ALLOWED_ATRIBUTES:
-            with database.Database(decoded_token['user_email'], decoded_token['database_name']) as db:
-                return getattr(db, query_type)(query).json()
-        else:
-            return make_response(server_response.BadResponse("Invalid database query type").json(), 400)
-    return make_response(server_response.BadResponse("Unkown error").json(), 400)
+        with database.user.UserDatabase(decoded_token['user_email'], decoded_token['database_name']) as db:
+            return api_response.APIResponse.good(query=request.url, database_response=db.execute(query)).get_response()
+
+    return api_response.APIResponse.bad(query=request.url, error_message="Unkown error").get_response()
 
 
 #
@@ -83,7 +84,11 @@ def database_use(query_type, decoded_token: dict):
 def before_request():
     g.user = None
     if 'user_id' in session:
-        g.user = database.User.get_user_by_id(session['user_id'])
+        try:
+            g.user = database.root.types.user.User.get(user_id=session['user_id'])
+        except Exception as e:
+            print(e)
+            g.user = None
 
 
 def restricted_login_access(func):
@@ -104,12 +109,14 @@ def signup():
         user_email = request.form['email']
         user_password = hashlib.sha256(bytes(request.form['password'], 'utf8')).hexdigest()
 
-        user = database.User.create(user_fullname, user_email, user_password)
-        if user:
+        try:
+            user = database.root.types.user.User.create(user_fullname=user_fullname, user_email=user_email, user_password=user_password)
             session['user_id'] = user.user_id
+            print(True)
+            print(user)
             return redirect(url_for("profile"))
-        else:
-            return render_template("signup.html", error_message="* Something went wrong while creating the account, maybe its already created")
+        except Exception as e:
+            return render_template("signup.html", error_message="* Something went wrong while creating the account, maybe its already created" + str(e))
     return render_template("signup.html")
 
 
@@ -120,14 +127,14 @@ def login():
 
         user_email = request.form['email']
         user_password = hashlib.sha256(bytes(request.form['password'], 'utf8')).hexdigest()
-
-        user = database.User.get_user_by_email(user_email)
-
-        if user and user.check_pass(user_password):
-            session['user_id'] = user.user_id
-            return redirect(url_for("profile"))
-        else:
-            return render_template("login.html", error_message="* Incorrect email or password")
+        try:
+            user = database.root.types.user.User.get(user_email=user_email)
+            if user.check_pass(user_password):
+                session['user_id'] = user.user_id
+                return redirect(url_for("profile"))
+        except:
+            pass
+        return render_template("login.html", error_message="* Incorrect email or password")
     return render_template("login.html")
 
 
@@ -151,19 +158,29 @@ def database_create():
         token_id = request.form.get('token_id')
         if token_id and activation_code:
             # verify match
-            token = database.Token.get(token_id)
-            token.verify_code(activation_code)
+            try:
+                token = database.root.types.token.Token.get(token_id=token_id)
+                token.verify_code(activation_code)
+            except:
+                pass
         if token_id:
             return redirect(url_for('database_stats', token_id=token_id))
         return redirect(url_for('profile'))
     else:
+        # get request
         dbname = request.args.get('dbname')
         token_id = request.args.get('token_id')
         token = None
         if dbname:
-            token = database.Token.create(g.user, dbname)
+            try:
+                token = database.root.types.token.Token.create(user=g.user, dbname=dbname)
+            except:
+                pass
         elif token_id:
-            token = database.Token.get(token_id)
+            try:
+                token = database.root.types.token.Token.get(token_id=token_id)
+            except:
+                pass
         if token:
             # token created
             return render_template('database_create.html', dbname=dbname, token=token)
@@ -176,13 +193,15 @@ def database_stats():
     token_id = request.args.get('token_id')
     if token_id:
         # token query found
-        token = database.Token.get(token_id)
-        if token:
+
+        try:
+            token = database.root.types.token.Token.get(token_id=token_id)
             # token found
             if token.user_id == g.user.user_id:
                 # match user
-
                 return render_template('database_stats.html', token=token)
+        except:
+            pass
     return redirect(url_for('profile'))
 
 
