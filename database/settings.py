@@ -3,6 +3,7 @@ import os
 
 current_dir = os.path.dirname(__file__)
 config_file_path = os.path.join(current_dir, '../config.json')
+
 with open(config_file_path) as file:
     CONFIG = json.load(file)
 

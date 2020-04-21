@@ -7,8 +7,10 @@ import database.root.types.token
 import json
 import hashlib
 import jwt
+import os
 
-with open("config.json") as file:
+current_dir = os.path.dirname(__file__)
+with open(os.path.join(current_dir, "config.json")) as file:
     CONFIG = json.load(file)
 TOKEN_KEY = CONFIG["token_secret_key"]
 app = Flask(__name__, template_folder="templates")
