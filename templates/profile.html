@@ -48,7 +48,13 @@
         ol{
             margin-left: 20%;
         }
-
+        #documentation-link{
+            color:blue;
+            text-decoration: none;
+        }
+        #documentation-link:visited{
+            color: blue;
+        }
 
     </style>
 
@@ -60,6 +66,8 @@
     <h1 class="title">
         Welcome {{g.user.user_fullname}}
     </h1>
+    <h3><a id="documentation-link" href="{{url_for('docs')}}">Documentation</a></h3>
+    <hr>
     <div class="form-container">
         <form method="get" action="{{url_for('database_create')}}">
             <label>New database: </label>

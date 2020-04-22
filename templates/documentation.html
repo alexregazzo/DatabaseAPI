@@ -3,25 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <title>API Documentation</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-        function load_markdown() {
-            for (let elt of document.querySelectorAll('.markdown')) {
-                elt.innerHTML = marked(elt.innerText);
-            }
+    <style>
+        code, a, div, span, ol, li, table, tr, td, th, p, h1, h2, h3, h4, h5 {
+            /*border: 1px solid black;*/
         }
 
-    </script>
+        body {
+            margin-left: 50px;
+            margin-right: 50px;
+            background-color: yellowgreen;
+        }
 
+        .content {
+
+        }
+
+        a.reference {
+            color: black;
+            text-decoration: none;
+
+        }
+
+        a.reference:visited {
+            color: black;
+
+        }
+
+        code.response {
+            font-size: 14px;
+            display: block;
+            font-family: monospace;
+            white-space: pre;
+            margin: 1em 0;
+        }
+
+    </style>
 </head>
-<body onload="load_markdown()">
-<div class="markdown">
-    # Database API documentation
-    <br>
-    <br>
-    **API endpoint**: {{api_endpoint}}
-    DOCUMENTANTION IN DEVELOPMENT
+<body>
+<div>
+    <div class="content">
+        <div>
+            <h3><a name='#getting-started'>Getting started</a></h3>
+            <p>
+                Database API is an online service API that provides a way to store data online.
+                It's use is very simple, you just need to <a href="{{url_for('signup')}}">make an account</a> or <a href="{{url_for('login')}}">login</a> and then <a href="{{url_for('profile')}}">create your database</a>.
+                Then you'll need to activate the token through a code sent to your email and it's done! You're ready to use!
+            </p>
+            <hr>
+            <h3><a name="#api-endpoint">API Endpoint</a></h3>
+            <p>
+                {{api_endpoint}}
+            </p>
+            <hr>
+            <h3><a name="#request">Request</a></h3>
+            <p>
+                All requests are ALL made through GET method.
+                <br>
+                Two params are ALWAYS required: 'q' and 'token'.
+                <br>
+                The response is a JSON object as follows:
+                <code class="response">{{response_examples["generic_good"]}}</code>
+            </p>
+            <hr>
+            <h3><a name='#data-content'>Data content</a></h3>
+            <div>
+                <h4>status</h4>
+                <p>
+                    Type: int
+                    <br>
+                    Value:
+                    <br>
+                    200: good
+                    <br>
+                    400: bad
+                </p>
+            </div>
+            <div>
+                <h4>query</h4>
+                <p>
+                    Type: str
+                    <br>
+                    Value: [url request]
+                </p>
+            </div>
+            <div>
+                <h4>token</h4>
+                <p>
+                    Type: str or null
+                    <br>
+                    Value: [token sent]
+                </p>
+            </div>
+            <div>
+                <h4>database_response</h4>
+                <p>
+                    Type: json object or null
+                    <br>
+                    Note: related to the database
+                    <br>
+                    Value:
+                </p>
+                <div style="border: 1px solid black">
+                    <h4>status</h4>
+                    <p>
+                        Type: int
+                        <br>
+                        Value:
+                        <br>
+                        200: good
+                        <br>
+                        400: bad
+                    </p>
+                    <h4>query</h4>
+                    <p>
+                        Type: str
+                        <br>
+                        Value: [sql query sent]
+                    </p>
+                    <h4>error_message</h4>
+                    <p>
+                        Type: str or null
+                        <br>
+                        Value: [an error message if any]
+                        <br>
+                        Note: an error message should always appear when status is not good
+                        <br>
+                        Note: this is related to the database
+                    </p>
+                    <h4>results</h4>
+                    <p>
+                        Type: list
+                        <br>
+                        Value: [select query results as json objects ("column":"result")]
+                    </p>
+                    <h4>lastrowid</h4>
+                    <p>
+                        Type: int or null
+                        <br>
+                        Value: [when insert query is made, return last insert id]
+                    </p>
+                </div>
+                <h4>error_message</h4>
+                <p>
+                    Type: str or null
+                    <br>
+                    Value: [an error message if any]
+                    <br>
+                    Note: an error message should always appear when status is not good
+                    <br>
+                    Note: this is related to the request
+                </p>
 
+            </div>
+            <hr>
+            <h3><a name="#sql-query">SQL query</a></h3>
+            <p>
+                The SQL query you pass in as 'q' should always be ONE statement of SQL.
+                Adding more than one will result in a database error.
+                The database in use is <a href="https://docs.python.org/3/library/sqlite3.html">python's sqlite3</a>.
+                Use link to look into creation of tables and queries particularities.
+                <br>
+                After the token is get, the next step is the creation of the table. Attempt of creating database will result in error.
+
+            </p>
+            <!--            <hr>-->
+            <!--            <h3><a>Examples</a></h3>-->
+            <!--            <p>-->
+            <!---->
+            <!--            </p>-->
+        </div>
+    </div>
 </div>
 </body>
 </html>
+<script>
+    // setTimeout('window.location.reload()', 500);
+</script>

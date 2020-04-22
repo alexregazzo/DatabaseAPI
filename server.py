@@ -1,12 +1,13 @@
 from flask import Flask, request, session, redirect, url_for, g, render_template, Response
 from functools import wraps
 import api_response
+import database.response
 import database.user
 import database.root.types.user
 import database.root.types.token
 import json
 import hashlib
-import jwt
+
 import os
 
 # TODO: setup logging
@@ -30,19 +31,30 @@ def index():
 @app.route("/docs")
 def docs():
     api_endpoint = request.url_root[:-1] + url_for('database_use')
+    token_example = "YOUR_TOKEN_EXAMPLE"
+    sql_query_example = "YOUR_SQL_QUERY"
+    request_query_example = f"{api_endpoint}/?q={sql_query_example}&token={token_example}"
     response_examples = {
-        'request_error': api_response.APIResponse.bad(query=api_endpoint + "?token=your_api_token&q=select * from tablename", error_message="Some error message").json(indent=4)
+        'generic_good': api_response.APIResponse.good(
+            query=request_query_example,
+            token_token=token_example,
+            database_response=database.response.DatabaseResponse.good(
+                query=sql_query_example
+            )
+        ).json(indent=4),
+        'request_error': api_response.APIResponse.bad(
+            query=request_query_example,
+            error_message="Generic error message"
+        ).json(indent=4),
     }
-    return render_template("documentation.html", api_endpoint=api_endpoint, response_examples=response_examples)
-
-
-@app.route("/docs/file")
-def docs_file():
-    try:
-        with open(os.path.join(current_dir, 'templates/docs.md')) as f:
-            return Response(f.read(), mimetype="text/plain")
-    except Exception as e:
-        return e
+    return render_template(
+        "documentation.html",
+        sql_query_example=sql_query_example,
+        request_query_example=request_query_example,
+        token_example=token_example,
+        api_endpoint=api_endpoint,
+        response_examples=response_examples
+    )
 
 
 def restricted_token_access(func):
