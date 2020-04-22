@@ -51,6 +51,9 @@ class Token:
         if self.token_activation_code is None or self.token_activation_code == "":
             raise Exception("No activation code")
 
+        if datetime.datetime.now() > datetime.datetime.strptime(self.token_activation_code_expiration, database.settings.DATETIME_FORMAT):
+            raise Exception("Time expired")
+
         if self.token_activation_code.upper() == activation_code.upper():
             self.token_active = 1
             self.token_activation_code = ''

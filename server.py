@@ -180,6 +180,8 @@ def database_create():
             # verify match
             try:
                 token = database.root.types.token.Token.get(token_id=token_id)
+                if token.token_active:
+                    return redirect(url_for('database_stats', token_id=token_id))
                 token.verify_code(activation_code)
             except:
                 pass
@@ -203,6 +205,8 @@ def database_create():
                 pass
         if token:
             # token created
+            if token.token_active:
+                return redirect(url_for('database_stats', token_id=token_id))
             return render_template('database_create.html', dbname=dbname, token=token)
         return redirect(url_for('profile'))
 
@@ -220,8 +224,10 @@ def database_stats():
                 # match user
                 uses = token.get_uses()
                 return render_template('database_stats.html', token=token, uses=uses)
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            raise
+
     return redirect(url_for('profile'))
 
 

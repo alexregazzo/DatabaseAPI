@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Creating '{{dbname}}'</title>
-    <style>
-        body {
-            background-color: #48c774;
-        }
-    </style>
+
     <script>
         let expiration_time = new Date('{{token.token_activation_code_expiration}}').getTime();
 
@@ -28,30 +24,75 @@
         }
 
         window.onload = function () {
-            update_timer();
             setInterval('update_timer()', 500);
         }
 
 
     </script>
+    <style>
+        body, a, div, span, ol, li, table, tr, td, th, p, h1, h2, h3, h4, h5 {
+            /*border: 1px solid black;*/
+        }
+
+        body {
+            background-color: #48c774;
+        }
+
+        .content {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        #inicio {
+            color: blue;
+            text-decoration: none;
+            text-align: center;
+            align-content: center;
+            border: 1px solid black;
+        }
+
+        #inicio:visited {
+            color: blue;
+        }
+
+        #expiration {
+            background-color: yellowgreen;
+        }
+    </style>
 </head>
 <body>
-<div>
-    <p>Your activation code was sent to your email from 'regazzo.database.api@gmail.com'. Check your spam if not found</p>
-</div>
-<div>
-    <a href="{{url_for('profile')}}">Inicio</a>
+
+<div class="content">
+    <a id="inicio" href="{{url_for('profile')}}">Inicio</a>
+    <h3>
+        {{token.token_database_name}}
+    </h3>
     <div>
         <p>
-            It expires in <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span> <span id="expired_message" style="color: orangered"></span>
+            Your activation code was sent to your email from 'regazzo.database.api@gmail.com'.
+            <br>
+            Check your spam box if not found.
         </p>
     </div>
-    <form method="post" action="">
-        <label for="activation_code">Activation code</label><br>
-        <input autocomplete="off" id="activation_code" type="text" name="activation_code" placeholder="6-digit alphanumeric code"><br>
-        <input type="hidden" name="token_id" value="{{token.token_id}}">
-        <input type="submit"/>
-    </form>
+
+    <div>
+        <p>
+            <span id="expiration">
+                The code expires in <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span> <span id="expired_message" style="color: orangered"></span>
+            </span>
+        </p>
+    </div>
+    <div>
+        <form method="post" action="">
+            <label for="activation_code">Activation code</label><br>
+            <input autocomplete="off" id="activation_code" type="text" name="activation_code" placeholder="6-digit alphanumeric code"><br>
+            <input type="hidden" name="token_id" value="{{token.token_id}}">
+            <input type="submit"/>
+        </form>
+    </div>
 </div>
 </body>
 </html>
+<script>
+    // setTimeout('window.location.reload()', 1500);
+</script>

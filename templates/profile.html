@@ -4,51 +4,85 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Profile {{g.user.user_fullname}}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-    <script>
-        function add_class(elt, classname) {
-            // elt.classList.toggle(classname);
-            elt.classList.add(classname)
+    <style>
+        div, h3, ol, li, form, label, input, body {
+            /*border: 1px solid black;*/
         }
 
-        function remove_class(elt, classname) {
-            elt.classList.remove(classname)
+        body {
+            background-color: #48c774;
         }
-    </script>
+
+        .title {
+            text-align: center;
+        }
+
+        .form-container {
+            text-align: center;
+            margin: auto;
+        }
+
+        .new-dbname {
+            background-color: #40c070;;
+            border: 2px solid orangered;
+            border-radius: 10px;
+            text-align: center;
+            color: black;
+        }
+
+        a:visited {
+            color: blue;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue
+        }
+
+        .database-name {
+            font-size: 15pt;
+        }
+        .database-number{
+            font-size: 15pt;
+        }
+        ol{
+            margin-left: 20%;
+        }
+
+
+    </style>
+
 </head>
 <body>
-<section class="hero is-success is-fullheight">
-    <div class="hero-body">
-        <div class="container">
-            <h1 class="title">
-                Welcome {{g.user.user_fullname}}
-            </h1>
-            <div class="container">
-                <div class="field">
-                    <form method="get" action="{{url_for('database_create')}}">
-                        <label>New database: </label>
-                        <input type="text" name="dbname" placeholder="name"><br>
-                        <input type="submit">
-                    </form>
-                </div>
 
-                <div class="field">
-                    <ol>
-                        {% for token in g.user.get_tokens() %}
 
-                        <li>
-                            <a href="{{url_for('database_stats', token_id=token.token_id)}}">
-                                {{ token.token_database_name }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ol>
-                </div>
-            </div>
-        </div>
+<div>
+    <h1 class="title">
+        Welcome {{g.user.user_fullname}}
+    </h1>
+    <div class="form-container">
+        <form method="get" action="{{url_for('database_create')}}">
+            <label>New database: </label>
+            <input class="new-dbname" type="text" name="dbname" placeholder="name">
+            <input type="submit">
+        </form>
     </div>
-</section>
+    <hr>
+    <div>
+        <h3 class="title">
+            Databases
+        </h3>
+        <ol>
+            {% for token in g.user.get_tokens() %}
+            <li class="database-number">
+                <a href="{{url_for('database_stats', token_id=token.token_id)}}">
+                    <span class="database-name">{{ token.token_database_name }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
 </body>
 </html>
 <script>

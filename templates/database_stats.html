@@ -27,46 +27,111 @@
 
         }
 
-        div {
+        body, a, div, span, ol, li, table, tr, td, th, p {
             /*border: 1px solid black;*/
         }
+
+        #content {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        #inicio {
+            color: blue;
+            text-decoration: none;
+            text-align: center;
+            align-content: center;
+        }
+
+        #inicio:visited {
+            color: blue;
+        }
+
+
+        #token {
+            margin: auto;
+        }
+
+        #token-warning {
+            background-color: yellow;
+            color: red;
+        }
+
+        #token-info {
+            margin-left: 10%;
+            text-align: left;
+        }
+
 
     </style>
 </head>
 <body>
-<div>
-    <a href="{{url_for('profile')}}">Inicio</a>
-    <h1 style="text-align: center;">{{token.token_database_name}}</h1>
+<div id="content">
+    <a id="inicio" href="{{url_for('profile')}}">Inicio</a>
+    <h1>{{token.token_database_name}}</h1>
     <div>
-        Token:
-        <br>
-        <div id="token" title="COPY">
-            {{token.token_token}}
+        <h3>Token</h3>
+        <div id="token">
+            <p>
+                {{token.token_token}}
+            </p>
         </div>
-        <span style="color: red; background-color: yellow">
-            *Warning: DO NOT SHARE THIS TOKEN. KEEP IT PRIVATE!
-        </span>
-        <br>
-        <span>
-            Token use:<br>
-            http://alextestdomain.duckdns.org:8245/api/v1/query/?q=[YOUR_SQL_QUERY]&token=[YOUR_TOKEN]
-        </span>
+        <div>
+            <p>
+                <span id="token-warning">
+                    *Warning: DO NOT SHARE THIS TOKEN. KEEP IT PRIVATE!
+                </span>
+            </p>
+        </div>
+        <div>
+            <p>
+                Token use
+            </p>
+            <p>
+                http://databaseapi.duckdns.org:8245/api/v1/query/?q=[YOUR_SQL_QUERY]&token=[YOUR_TOKEN]
+            </p>
+        </div>
     </div>
-    <p>
-        Creation: {{token.token_creation}}
-    </p>
-    <p>
-        Active: {{'true' if token.token_active == 1 else 'false'}}
-    </p>
-    {% if token.token_active != 1 and token.token_activation_code != ''%}
-    <p>
-        Code expires on: {{token.token_activation_code_expiration}}
-        <a href="{{url_for('database_create', token_id=token.token_id)}}">Enter code</a>
-    </p>
-    {%endif%}
+    <div id="token-info">
+        <h4>Token information</h4>
+        <p>
+            Creation: {{token.token_creation}}
+        </p>
+        <p>
+            Active: <span
+                style="color: {{'green' if token.token_active == 1 else 'red'}};background-color: {{'transparent' if token.token_active == 1 else 'yellow'}};">{{'true' if token.token_active == 1 else 'false'}}</span>
+        </p>
+        {% if token.token_active != 1 and token.token_activation_code != ''%}
+        <div>
+            <p>
+                <span style="background-color: #ff07;">
+                Code expires on: {{token.token_activation_code_expiration}}
+                <a href="{{url_for('database_create', token_id=token.token_id)}}">Enter code</a>
+                </span>
+
+            </p>
+        </div>
+        {%endif%}
+    </div>
+
+    <!--
+
+
+
+
+
+
+
+
+
+
+
+
+    -->
+
     <hr>
     <div>
-        <h3 style="text-align: center">Requests</h3>
+        <h3>Requests</h3>
         <table>
             <tbody>
             <tr>
@@ -90,7 +155,7 @@
                             <th>Error message</th>
                         </tr>
                         <tr>
-                            <td style='color: {{"black" if use.data['database_response']['status'] < 400 else "red"}};'>{{use.data['database_response']['status']}}</td>
+                            <td style='color: {{"black" if use.data["database_response"]["status"] < 400 else "red"}};'>{{use.data['database_response']['status']}}</td>
                             <td>{{use.data['database_response']['query']}}</td>
                             <td>{{use.data['database_response']['error_message']}}</td>
 
@@ -116,3 +181,6 @@
 
 </body>
 </html>
+<script>
+    // setTimeout('window.location.reload()', 1500);
+</script>
