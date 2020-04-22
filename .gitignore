@@ -3,5 +3,5 @@ config.json
 __pycache__/
 **/*.pyc
 **/*.db
-database/data/
+data/
 .pytest_cache/

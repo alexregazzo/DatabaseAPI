@@ -203,8 +203,9 @@ def database_create():
     else:
         # get request
         dbname = request.args.get('dbname')
-        if re.match('[a-zA-Z0-9 _-]+', dbname) is None:
-            return redirect(url_for('profile'))
+        if dbname:
+            if re.match('[a-zA-Z0-9 _-]+', dbname) is None:
+                return redirect(url_for('profile'))
         token_id = request.args.get('token_id')
         token = None
         if dbname:
