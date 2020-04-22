@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for, g, render_template, Response
+from flask import Flask, request, session, redirect, url_for, g, render_template
 from functools import wraps
 import api_response
 import database.response
