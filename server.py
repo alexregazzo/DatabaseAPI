@@ -7,8 +7,8 @@ import database.root.types.user
 import database.root.types.token
 import json
 import hashlib
-
 import os
+import re
 
 # TODO: setup logging
 # TODO: treat web pages errors better
@@ -176,7 +176,7 @@ def login():
 @restricted_login_access
 def profile():
     """
-    TODO: revoke token [database]
+    TODO: logout button
     """
     return render_template("profile.html", databases_names="<br/>".join([token.token_database_name for token in g.user.get_tokens()]))
 
@@ -203,6 +203,8 @@ def database_create():
     else:
         # get request
         dbname = request.args.get('dbname')
+        if re.match('[a-zA-Z0-9 _-]+', dbname) is None:
+            return redirect(url_for('profile'))
         token_id = request.args.get('token_id')
         token = None
         if dbname:
@@ -226,6 +228,9 @@ def database_create():
 @app.route("/database/stats")
 @restricted_login_access
 def database_stats():
+    # TODO: create disable button
+    # TODO: create delete button
+
     token_id = request.args.get('token_id')
     if token_id:
         # token query found

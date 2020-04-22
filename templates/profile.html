@@ -71,7 +71,7 @@
     <div class="form-container">
         <form method="get" action="{{url_for('database_create')}}">
             <label>New database: </label>
-            <input class="new-dbname" type="text" name="dbname" placeholder="name">
+            <input class="new-dbname" type="text" name="dbname" placeholder="name" pattern="[a-zA-Z0-9 _-]+">
             <input type="submit">
         </form>
     </div>
