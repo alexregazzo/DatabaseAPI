@@ -6,6 +6,7 @@ import database.root.response
 import database.root.types.user
 import database.root.types.token
 import database.root.types.use
+import datetime
 
 
 class RootDatabase:
@@ -93,7 +94,8 @@ class RootDatabase:
         Warning: user_id ignored
         :rtype: database.root.types.user.User
         """
-        response = self.execute(f"INSERT INTO user (user_fullname, user_email, user_password) VALUES ('{user_fullname}', '{user_email}', '{user_password}')")
+        user_creation = datetime.datetime.now().strftime(database.settings.DATETIME_FORMAT)
+        response = self.execute(f"INSERT INTO user (user_fullname, user_email, user_password, user_creation) VALUES ('{user_fullname}', '{user_email}', '{user_password}', '{user_creation}')")
         if response.ok:
             response = self.execute(f"SELECT * FROM user WHERE user_email='{user_email}'")
             if response.ok:
@@ -128,7 +130,8 @@ class RootDatabase:
                 dbname = dbname_dict['dbname']
                 if current_dbname == dbname:
                     raise Exception("Database already exists")
-            response = self.execute(f"INSERT INTO token (user_id, token_token, token_database_name) VALUES ('{user_id}', '{token_token}','{token_database_name}')")
+            token_creation = datetime.datetime.now().strftime(database.settings.DATETIME_FORMAT)
+            response = self.execute(f"INSERT INTO token (user_id, token_token, token_database_name, token_creation) VALUES ('{user_id}', '{token_token}','{token_database_name}', '{token_creation}')")
             if response.ok:
                 token_id = response.lastrowid
                 response = self.execute(f"SELECT * FROM token WHERE token_id = '{token_id}'")
@@ -163,7 +166,8 @@ class RootDatabase:
         Warning: user_id ignored
         :rtype: bool
         """
-        response = self.execute(f"INSERT INTO use (token_id, use_data) VALUES ((SELECT token_id FROM token WHERE token_token = '{token_token}'), '{use_data}')")
+        use_creation = datetime.datetime.now().strftime(database.settings.DATETIME_FORMAT)
+        response = self.execute(f"INSERT INTO use (token_id, use_data, use_creation) VALUES ((SELECT token_id FROM token WHERE token_token = '{token_token}'), '{use_data}', '{use_creation}')")
         return response.ok
 
     def select_uses(self, **kwargs):

@@ -230,6 +230,7 @@ def database_create():
 def database_stats():
     # TODO: create disable button
     # TODO: create delete button
+    # TODO: limit amount of use shown
 
     token_id = request.args.get('token_id')
     if token_id:

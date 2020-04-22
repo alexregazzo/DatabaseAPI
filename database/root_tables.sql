@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS user
     user_email    text    not null unique,
     user_active   integer not null default 1 check (user_active in (0, 1)),
     user_password text    not null,
-    user_creation text    not null default current_timestamp
+    user_creation text    not null
 );
 
 CREATE TABLE IF NOT EXISTS token
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS token
     user_id                          integer not null,
     token_token                      text unique,
     token_database_name              text    not null,
-    token_creation                   text    not null default current_timestamp,
+    token_creation                   text    not null,
     token_active                     integer not null default 0 check (token_active in (0, 1)),
     token_activation_code            text    not null default '',
     token_activation_code_expiration text    not null default '',
@@ -26,6 +26,6 @@ CREATE TABLE IF NOT EXISTS use
     use_id       integer primary key autoincrement,
     token_id     integer not null,
     use_data     text    not null,
-    use_creation text    not null default current_timestamp,
+    use_creation text    not null,
     foreign key (token_id) references token (token_id)
 )
