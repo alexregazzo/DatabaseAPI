@@ -33,7 +33,7 @@ def docs():
     api_endpoint = request.url_root[:-1] + url_for('database_use')
     token_example = "YOUR_TOKEN_EXAMPLE"
     sql_query_example = "YOUR_SQL_QUERY"
-    request_query_example = f"{api_endpoint}/?q={sql_query_example}&token={token_example}"
+    request_query_example = f"{api_endpoint}?q={sql_query_example}&token={token_example}"
     response_examples = {
         'generic_good': api_response.APIResponse.good(
             query=request_query_example,
