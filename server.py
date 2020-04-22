@@ -53,11 +53,13 @@ def restricted_token_access(func):
             token_token = request.args.get('token')
             if token_token:
                 try:
-                    decoded_token = jwt.decode(token_token, TOKEN_KEY)
+                    with database.root.RootDatabase() as root_db:
+                        results = root_db.select_tokens(token_token=token_token)
                 except:
                     return api_response.APIResponse.bad(query=request.url, error_message="Invalid token").get_response()
                 else:
-                    return func(*args, token=token_token, decoded_token=decoded_token, **kwargs)
+                    if results:
+                        return func(*args, token=results[0], **kwargs)
             return api_response.APIResponse.bad(query=request.url, error_message="Missing token").get_response()
 
     return authenticate_token
@@ -65,18 +67,18 @@ def restricted_token_access(func):
 
 @app.route("/api/v1/query/")
 @restricted_token_access
-def database_use(token: str, decoded_token: dict):
+def database_use(token: database.root.types.token.Token):
     try:
         query = request.args['q']
     except KeyError:
-        return api_response.APIResponse.bad(query=request.url, token=token, error_message="Arguments missing: q").get_response()
+        return api_response.APIResponse.bad(query=request.url, token_token=token.token_token, error_message="Arguments missing: q").get_response()
     except:
         pass
     else:
-        with database.user.UserDatabase(decoded_token['user_email'], decoded_token['database_name']) as db:
-            return api_response.APIResponse.good(query=request.url, token=token, database_response=db.execute(query)).get_response()
+        with database.user.UserDatabase(token.user_email, token.token_database_name) as db:
+            return api_response.APIResponse.good(query=request.url, token_token=token.token_token, database_response=db.execute(query)).get_response()
 
-    return api_response.APIResponse.bad(query=request.url, token=token, error_message="Unkown error").get_response()
+    return api_response.APIResponse.bad(query=request.url, token_token=token.token_token, error_message="Unkown error").get_response()
 
 
 #
@@ -221,7 +223,7 @@ if __name__ == "__main__":
     import platform
 
     if platform.system() == "Windows":
-        # app.run("127.0.0.4", port=80, debug=True)
-        app.run("127.0.0.4", port=5478, debug=True)
+        app.run("127.0.0.4", port=80, debug=True)
+        # app.run("127.0.0.4", port=5478, debug=True)
     elif platform.system() == "Linux":
         app.run(host='0.0.0.0', port=8245)

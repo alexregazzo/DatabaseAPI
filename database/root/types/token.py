@@ -41,6 +41,11 @@ class Token:
             return results[0]
         raise Exception('Token not found')
 
+    @property
+    def user_email(self):
+        with database.root.RootDatabase() as root_db:
+            return root_db.select_user(user_id=self.user_id).user_email
+
     def verify_code(self, activation_code: str) -> None:
         """Return whether the code was verified"""
         if self.token_activation_code is None or self.token_activation_code == "":
@@ -67,6 +72,8 @@ class Token:
             body = f"Confirmation code: {self.token_activation_code}"
             msg = f'Subject: {subject}\n\n{body}'
             smtp.sendmail("regazzo.database.api@gmail.com", user.user_email, msg)
+        with database.root.RootDatabase() as root_db:
+            root_db.update_token(token_id=self.token_id, **self.get_dict_update())
 
         # print(f"MOCK EMAIL SEND: to: {user.user_email} code: {self.token_activation_code} creation: {self.token_creation}")
 
@@ -79,19 +86,8 @@ class Token:
         :rtype: Token
         """
         with database.root.RootDatabase() as root_db:
-            token = root_db.insert_token(user_id=user.user_id, token_database_name=dbname)
-
-            # Create token
-            token.token_token = jwt.encode({
-                "token_id": token.token_id,
-                "user_id": user.user_id,
-                "user_email": user.user_email,
-                "database_name": token.token_database_name,
-                "token_creation": token.token_creation,
-            }, database.settings.TOKEN_KEY).decode('utf8')
-
-            token.create_activation_code(user)
-            root_db.update_token(token_id=token.token_id, **token.get_dict_update())
+            token = root_db.insert_token(user_id=user.user_id, token_token=secrets.token_hex(10), token_database_name=dbname)
+        token.create_activation_code(user)  # TODO: make this better
         return token
 
     def get_uses(self):

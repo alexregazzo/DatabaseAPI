@@ -21,9 +21,8 @@ class Use:
         :param api_response: APIResponse object
         """
         try:
-            decoded_token = jwt.decode(api_response.token, database.settings.TOKEN_KEY)
             with database.root.RootDatabase() as root_db:
-                root_db.insert_use(token_id=decoded_token['token_id'], use_data=api_response.json())
+                root_db.insert_use(token_token=api_response.token, use_data=api_response.json())
         except:
             return False
         return True

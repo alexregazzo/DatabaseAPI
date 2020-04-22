@@ -8,7 +8,7 @@ import database.root.types.use
 class APIResponse:
     """Every API response is a call of json method from this class"""
 
-    def __init__(self, *, status: int, query: str, token: str or None = None, database_response: database.response.DatabaseResponse or None = None, error_message: str or None = None):
+    def __init__(self, *, status: int, query: str, token_token: str or None = None, database_response: database.response.DatabaseResponse or None = None, error_message: str or None = None):
         pass
         """
         :param status: status code of the request
@@ -18,17 +18,17 @@ class APIResponse:
         """
         assert type(status) == int
         assert type(query) is str
-        assert type(token) is str or token is None
+        assert type(token_token) is str or token_token is None
         assert isinstance(database_response, database.response.DatabaseResponse) or database_response is None
         assert type(error_message) is str or error_message is None
 
         self.status = status
         self.query = urllib.parse.unquote(query)
-        self.token = token
+        self.token = token_token
         self.database_response = database_response
         self.error_message = error_message
         if self.token:
-            print("OK" if database.root.types.use.Use.create(self) else "KO" )
+            print("OK" if database.root.types.use.Use.create(self) else "KO")
         print(self)
 
     def get_response(self) -> flask.Response:
@@ -36,12 +36,12 @@ class APIResponse:
         return flask.Response(response=self.json(), status=self.status, mimetype='application/json')
 
     @classmethod
-    def good(cls, *, query: str, token: str or None = None, database_response: database.response.DatabaseResponse):
-        return cls(status=200, query=query, token=token, database_response=database_response)
+    def good(cls, *, query: str, token_token: str or None = None, database_response: database.response.DatabaseResponse):
+        return cls(status=200, query=query, token_token=token_token, database_response=database_response)
 
     @classmethod
-    def bad(cls, *, query: str, token: str or None = None, error_message: str or None):
-        return cls(status=400, query=query, token=token, error_message=error_message)
+    def bad(cls, *, query: str, token_token: str or None = None, error_message: str or None):
+        return cls(status=400, query=query, token_token=token_token, error_message=error_message)
 
     @property
     def ok(self) -> bool:

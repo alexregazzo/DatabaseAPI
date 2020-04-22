@@ -115,7 +115,7 @@ class RootDatabase:
     # def update_user(self):
     #     pass
 
-    def insert_token(self, *, user_id: int, token_database_name: str):
+    def insert_token(self, *, user_id: int, token_token: str, token_database_name: str):
         """
         :return: Token
         Warning: user_id ignored
@@ -128,7 +128,7 @@ class RootDatabase:
                 dbname = dbname_dict['dbname']
                 if current_dbname == dbname:
                     raise Exception("Database already exists")
-            response = self.execute(f"INSERT INTO token (user_id, token_database_name) VALUES ('{user_id}', '{token_database_name}')")
+            response = self.execute(f"INSERT INTO token (user_id, token_token, token_database_name) VALUES ('{user_id}', '{token_token}','{token_database_name}')")
             if response.ok:
                 token_id = response.lastrowid
                 response = self.execute(f"SELECT * FROM token WHERE token_id = '{token_id}'")
@@ -157,13 +157,13 @@ class RootDatabase:
         if not response.ok:
             raise Exception("Could not update token")
 
-    def insert_use(self, *, token_id: int, use_data: str):
+    def insert_use(self, *, token_token: str, use_data: str):
         """
         :return: Use
         Warning: user_id ignored
         :rtype: bool
         """
-        response = self.execute(f"INSERT INTO use (token_id, use_data) VALUES ('{token_id}', '{use_data}')")
+        response = self.execute(f"INSERT INTO use (token_id, use_data) VALUES ((SELECT token_id FROM token WHERE token_token = '{token_token}'), '{use_data}')")
         return response.ok
 
     def select_uses(self, **kwargs):
