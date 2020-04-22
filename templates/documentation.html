@@ -62,48 +62,12 @@
                 Two params are ALWAYS required: 'q' and 'token'.
                 <br>
                 The response is a JSON object as follows:
-                <code class="response">{{response_examples["generic_good"]}}</code>
+                <code style="border: 1px solid black; border-radius: 10px;padding: 20px" class="response">{{response_examples["generic_good"]}}</code>
             </p>
             <hr>
             <h3><a name='#data-content'>Data content</a></h3>
-            <div>
-                <h4>status</h4>
-                <p>
-                    Type: int
-                    <br>
-                    Value:
-                    <br>
-                    200: good
-                    <br>
-                    400: bad
-                </p>
-            </div>
-            <div>
-                <h4>query</h4>
-                <p>
-                    Type: str
-                    <br>
-                    Value: [url request]
-                </p>
-            </div>
-            <div>
-                <h4>token</h4>
-                <p>
-                    Type: str or null
-                    <br>
-                    Value: [token sent]
-                </p>
-            </div>
-            <div>
-                <h4>database_response</h4>
-                <p>
-                    Type: json object or null
-                    <br>
-                    Note: related to the database
-                    <br>
-                    Value:
-                </p>
-                <div style="border: 1px solid black">
+            <div style="border: 1px solid black;padding: 20px;border-radius: 10px;">
+                <div>
                     <h4>status</h4>
                     <p>
                         Type: int
@@ -114,12 +78,72 @@
                         <br>
                         400: bad
                     </p>
+                </div>
+                <div>
                     <h4>query</h4>
                     <p>
                         Type: str
                         <br>
-                        Value: [sql query sent]
+                        Value: [url request]
                     </p>
+                </div>
+                <div>
+                    <h4>token</h4>
+                    <p>
+                        Type: str or null
+                        <br>
+                        Value: [token sent]
+                    </p>
+                </div>
+                <div>
+                    <h4>database_response</h4>
+                    <p>
+                        Type: json object or null
+                        <br>
+                        Note: related to the database
+                        <br>
+                        Value:
+                    </p>
+                    <div style="border: 1px solid black; width: 90%; margin: auto;padding: 10px;border-radius: 10px;">
+                        <h4>status</h4>
+                        <p>
+                            Type: int
+                            <br>
+                            Value:
+                            <br>
+                            200: good
+                            <br>
+                            400: bad
+                        </p>
+                        <h4>query</h4>
+                        <p>
+                            Type: str
+                            <br>
+                            Value: [sql query sent]
+                        </p>
+                        <h4>error_message</h4>
+                        <p>
+                            Type: str or null
+                            <br>
+                            Value: [an error message if any]
+                            <br>
+                            Note: an error message should always appear when status is not good
+                            <br>
+                            Note: this is related to the database
+                        </p>
+                        <h4>results</h4>
+                        <p>
+                            Type: list
+                            <br>
+                            Value: [select query results as list of json objects ("column":"value")]
+                        </p>
+                        <h4>lastrowid</h4>
+                        <p>
+                            Type: int or null
+                            <br>
+                            Value: [when insert query is made, return last insert id]
+                        </p>
+                    </div>
                     <h4>error_message</h4>
                     <p>
                         Type: str or null
@@ -128,32 +152,10 @@
                         <br>
                         Note: an error message should always appear when status is not good
                         <br>
-                        Note: this is related to the database
+                        Note: this is related to the request
                     </p>
-                    <h4>results</h4>
-                    <p>
-                        Type: list
-                        <br>
-                        Value: [select query results as list of json objects ("column":"value")]
-                    </p>
-                    <h4>lastrowid</h4>
-                    <p>
-                        Type: int or null
-                        <br>
-                        Value: [when insert query is made, return last insert id]
-                    </p>
-                </div>
-                <h4>error_message</h4>
-                <p>
-                    Type: str or null
-                    <br>
-                    Value: [an error message if any]
-                    <br>
-                    Note: an error message should always appear when status is not good
-                    <br>
-                    Note: this is related to the request
-                </p>
 
+                </div>
             </div>
             <hr>
             <h3><a name="#sql-query">SQL query</a></h3>
