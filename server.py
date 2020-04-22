@@ -60,6 +60,9 @@ def restricted_token_access(func):
                 else:
                     if results:
                         return func(*args, token=results[0], **kwargs)
+                    else:
+                        return api_response.APIResponse.bad(query=request.url, error_message="Token not found").get_response()
+
             return api_response.APIResponse.bad(query=request.url, error_message="Missing token").get_response()
 
     return authenticate_token
